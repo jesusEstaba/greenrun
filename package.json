@@ -1,0 +1,23 @@
+{
+  "name": "greenrun",
+  "version": "1.0.0",
+  "description": "Bet API Rest service",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev:build": "tsc",
+    "dev:run": "tsc && nodemon -e js -w lib dist/main.js",
+    "dev:serve": "nodemon -e js -w lib dist/main.js"
+  },
+  "author": "Jesus Estaba",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/hapi": "^18.0.8",
+    "@types/node": "^20.1.2",
+    "nodemon": "^2.0.22",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "hapi": "^18.1.0"
+  },
+  "keywords": []
+}
