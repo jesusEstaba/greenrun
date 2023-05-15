@@ -13,12 +13,25 @@ To install the project dependencies, run the following command:
 npm install
 ```
 
-
+### Git hooks
 ```bash
-npx husky install
+npm run prepare
 ```
 > note:
-Husky helps us save time and maintain quality by providing a tool that, through Git hooks, always runs commands like test execution and linting verification when creating a commit. If any of these steps fail, it prevents the commit from being created.
+> Husky helps us save time and maintain quality by providing a tool that, through Git hooks, always runs commands like test execution and linting verification when creating a commit. If any of these steps fail, it prevents the commit from being created.
+
+### Docker 
+```bash
+docker-compose up -d 
+```
+> note:
+> Just in case You want to use a dockerized MySQL
+
+## Migrations
+### Run 
+```bash
+npm run database:migrations
+```
 
 ## Running Tests
 

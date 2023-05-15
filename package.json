@@ -9,7 +9,8 @@
     "dev:serve": "nodemon -e js -w lib dist/main.js",
     "lint": "eslint . --ext .ts",
     "test": "jest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "database:migrations": "knex migrate:latest"
   },
   "author": "Jesus Estaba",
   "license": "ISC",
@@ -23,12 +24,15 @@
     "eslint-config-airbnb-typescript": "^17.0.0",
     "husky": "^8.0.0",
     "jest": "^29.5.0",
+    "knex-migrate": "^1.7.4",
     "nodemon": "^2.0.22",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "hapi": "^18.1.0"
+    "hapi": "^18.1.0",
+    "knex": "^2.4.2",
+    "mysql2": "^3.3.1"
   },
   "keywords": []
 }

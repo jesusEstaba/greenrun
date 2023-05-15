@@ -12,9 +12,9 @@ export class CreateEvent implements UseCase<CreateEventAction> {
     }
 
     async execute(action: CreateEventAction): Promise<Event> {
-        const event = new Event();
-        event.sport = action.sport;
-        event.deleted = false;
+        const event = {
+            ...action,
+        } as Event;
 
         return this.eventRepository.save(event);
     }

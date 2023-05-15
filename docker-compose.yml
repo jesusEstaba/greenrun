@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: greenrun
+      MYSQL_USER: green
+      MYSQL_PASSWORD: changeit
+      MYSQL_ROOT_PASSWORD: changeit
+    ports:
+      - "3306:3306"

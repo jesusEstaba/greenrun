@@ -1,4 +1,5 @@
 import { Server } from 'hapi';
+import { betRoutes } from './modules/bet/infrastrcuture/http/routes';
 
 const init = async function (): Promise<Server> {
     const server: Server = new Server({
@@ -15,6 +16,8 @@ const init = async function (): Promise<Server> {
             };
         },
     });
+
+    server.route(betRoutes);
 
     await server.start();
 

@@ -19,7 +19,8 @@ module.exports = {
         "import/extensions": 0,
         "import/no-extraneous-dependencies": 0,
         "@typescript-eslint/indent": ["error", 4],
-        "@typescript-eslint/require-await": "off"
+        "@typescript-eslint/require-await": "off",
+        "@typescript-eslint/lines-between-class-members": "off",
     },
     overrides: [
         {
@@ -31,11 +32,15 @@ module.exports = {
             }
         },
         {
-            files: [
-                "*.spec.ts"
-            ],
+            files: ["*.spec.ts"],
             rules: {
                 "@typescript-eslint/unbound-method": "off"
+            }
+        },
+        {
+            files: ["**/routes.ts"],
+            rules: {
+                "@typescript-eslint/no-unsafe-assignment": "off"
             }
         }
     ]
