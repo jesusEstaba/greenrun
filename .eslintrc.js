@@ -18,6 +18,25 @@ module.exports = {
         "react/jsx-filename-extension": 0,
         "import/extensions": 0,
         "import/no-extraneous-dependencies": 0,
-        "@typescript-eslint/indent": ["error", 4]
-    }
+        "@typescript-eslint/indent": ["error", 4],
+        "@typescript-eslint/require-await": "off"
+    },
+    overrides: [
+        {
+            files: [
+                "./src/modules/core/UseCase.ts"
+            ],
+            rules: {
+                "@typescript-eslint/no-explicit-any": "off"
+            }
+        },
+        {
+            files: [
+                "*.spec.ts"
+            ],
+            rules: {
+                "@typescript-eslint/unbound-method": "off"
+            }
+        }
+    ]
 }
