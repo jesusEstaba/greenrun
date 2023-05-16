@@ -1,5 +1,6 @@
 import { Server } from 'hapi';
 import { betRoutes } from './modules/bet/infrastrcuture/http/routes';
+import { ValidationException } from './modules/core/ValidationException';
 
 const init = async function (): Promise<Server> {
     const server: Server = new Server({
@@ -18,6 +19,24 @@ const init = async function (): Promise<Server> {
     });
 
     server.route(betRoutes);
+
+    server.ext('onPreResponse', (request, h) => {
+        const response = request.response;
+
+        if (response instanceof ValidationException) {
+            return h.response({
+                message: response.message,
+            }).code(400);
+        }
+
+        if (response instanceof Error) {
+            return h.response({
+                message: response.message,
+            }).code(500);
+        }
+
+        return h.continue;
+    });
 
     await server.start();
 

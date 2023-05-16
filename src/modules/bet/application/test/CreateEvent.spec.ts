@@ -1,18 +1,10 @@
 import { EventRepository } from '../../domain/EventRepository';
 import { CreateEvent, CreateEventAction } from '../CreateEvent';
 import { Event } from '../../domain/Event';
+import { eventRepoMock } from './mocks';
 
-const eventRepo: EventRepository = {
-    save: jest.fn().mockImplementation((event: Event) => {
-
-        return {
-            ...event,
-            id: 'event-123',
-        } as Event;
-    }),
-};
-
-const useCase = new CreateEvent(eventRepo);
+let eventRepo: EventRepository;
+let useCase: CreateEvent;
 
 describe('create event', () => {
     it('when create event should save a event', async () => {
@@ -25,5 +17,15 @@ describe('create event', () => {
             sport: 'Formula 1',
         });
         expect(eventRepo.save).toBeCalledTimes(1);
+    });
+
+    beforeEach(() => {
+        eventRepo = eventRepoMock();
+
+        eventRepo.save = jest.fn().mockImplementation((event: Event) => (
+            { ...event, id: 'event-123' } as Event
+        ));
+
+        useCase = new CreateEvent(eventRepo);
     });
 });
