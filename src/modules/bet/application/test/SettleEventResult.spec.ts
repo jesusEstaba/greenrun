@@ -14,7 +14,7 @@ let walletRepo: WalletRepository;
 let useCase: SettleEventResult;
 
 describe('settle event result', () => {
-    it('when results are set should settle active bets and trigger payments for winners', async () => {
+    it('when results are set should settle bets and trigger payments for winners', async () => {
         await useCase.execute({
             eventId: 'event-123',
             options: [
@@ -24,10 +24,17 @@ describe('settle event result', () => {
         } as SettleEventResultAction);
 
         expect(betRepo.setResults).toHaveBeenCalledWith([
-            { id: 'bet-001', betOption: '1', result: 'won', status: 'active' },
-            { id: 'bet-002', betOption: '2', result: 'lost', status: 'active' },
-            { id: 'bet-003', betOption: '3', result: 'lost', status: 'active' },
-            { id: 'bet-004', betOption: '4', result: 'lost', status: 'active' },
+            { id: 'bet-001', betOption: '1', result: 'won', status: 'settled' },
+            { id: 'bet-002', betOption: '2', result: 'lost', status: 'settled' },
+            { id: 'bet-003', betOption: '3', result: 'lost', status: 'settled' },
+            { id: 'bet-004', betOption: '4', result: 'lost', status: 'settled' },
+        ]);
+
+        expect(userRepo.setStatesByBetId).toHaveBeenCalledWith([
+            { betId: 'bet-001', state: 'won' },
+            { betId: 'bet-002', state: 'lost' },
+            { betId: 'bet-003', state: 'lost' },
+            { betId: 'bet-004', state: 'lost' },
         ]);
 
         expect(userRepo.getByBetIds).toHaveBeenCalledWith([
@@ -41,7 +48,42 @@ describe('settle event result', () => {
         expect(betRepo.getByEventId).toBeCalledTimes(1);
         expect(betRepo.setResults).toBeCalledTimes(1);
         expect(userRepo.getByBetIds).toBeCalledTimes(1);
+        expect(userRepo.setStatesByBetId).toBeCalledTimes(1);
         expect(walletRepo.addWinnersFunds).toBeCalledTimes(1);
+    });
+
+    it('when are not winner should only settle bets results', async () => {
+        await useCase.execute({
+            eventId: 'event-123',
+            options: [
+                { option: '1', result: BetResult.Lost },
+                { option: '2', result: BetResult.Won },
+            ],
+        } as SettleEventResultAction);
+
+        expect(betRepo.setResults).toHaveBeenCalledWith([
+            { id: 'bet-001', betOption: '1', result: 'lost', status: 'settled' },
+            { id: 'bet-002', betOption: '2', result: 'won', status: 'settled' },
+            { id: 'bet-003', betOption: '3', result: 'lost', status: 'settled' },
+            { id: 'bet-004', betOption: '4', result: 'lost', status: 'settled' },
+        ]);
+
+        expect(userRepo.setStatesByBetId).toHaveBeenCalledWith([
+            { betId: 'bet-001', state: 'lost' },
+            { betId: 'bet-002', state: 'won' },
+            { betId: 'bet-003', state: 'lost' },
+            { betId: 'bet-004', state: 'lost' },
+        ]);
+
+        expect(userRepo.getByBetIds).toHaveBeenCalledWith([
+            'bet-002',
+        ]);
+
+        expect(betRepo.getByEventId).toBeCalledTimes(1);
+        expect(betRepo.setResults).toBeCalledTimes(1);
+        expect(userRepo.getByBetIds).toBeCalledTimes(1);
+        expect(userRepo.setStatesByBetId).toBeCalledTimes(1);
+        expect(walletRepo.addWinnersFunds).toBeCalledTimes(0);
     });
 
     it('when are not bets related to event should fail', async () => {
@@ -133,7 +175,11 @@ describe('settle event result', () => {
             ];
         });
 
-        userRepo.getByBetIds = jest.fn().mockImplementation(() => {
+        userRepo.getByBetIds = jest.fn().mockImplementation((ids: string[]) => {
+            if (ids.some(i => i === 'bet-002')) {
+                return [];
+            }
+
             return [
                 { odd: new Odd(1.1), amount: new Currency(1000), userId: 'user-123' } as UserBet,
             ];

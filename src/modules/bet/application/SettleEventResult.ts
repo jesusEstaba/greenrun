@@ -6,6 +6,7 @@ import { ValidationException } from '../../core/ValidationException';
 import { BetResult, BetStatus } from '../domain/Bet';
 import { AddFunds, WalletRepository } from '../domain/WalletRepository';
 import { Currency } from '../../core/Currency';
+import { UserBet } from '../domain/UserBet';
 
 export class SettleEventResult implements UseCase<SettleEventResultAction> {
     private betRepository: BetRepository;
@@ -48,21 +49,29 @@ export class SettleEventResult implements UseCase<SettleEventResultAction> {
             duplicated[option.option] = 1;
         }
 
+        const userBetsUpdates: UserBet[] = [];
         for (const bet of bets) {
             const option = action.options.find((o) => o.option === bet.betOption);
             bet.result = (option)
                 ? option.result
                 : BetResult.Lost;
+
+            if (bet.status === BetStatus.Active) {
+                bet.status = BetStatus.Settled;
+            }
+
+            userBetsUpdates.push({
+                betId: bet.id,
+                state: bet.result as string,
+            } as UserBet);
         }
 
         await this.betRepository.setResults(bets);
+        await this.userBetRepository.setStatesByBetId(userBetsUpdates);
 
         const winnerBetIds: string[] = bets.filter(b => b.result === BetResult.Won).map(b => b.id);
-        if (!winnerBetIds.length) {
-            return Promise.resolve({});
-        }
-
         const userBets = await this.userBetRepository.getByBetIds(winnerBetIds);
+
         const rewards = userBets.map(u => {
             const betAmount = u.amount.getValue();
             const reward = betAmount + (betAmount * u.odd.getValue());
@@ -73,7 +82,9 @@ export class SettleEventResult implements UseCase<SettleEventResultAction> {
             );
         });
 
-        await this.walletRepository.addWinnersFunds(rewards);
+        if (rewards.length) {
+            await this.walletRepository.addWinnersFunds(rewards);
+        }
 
         return Promise.resolve({});
     }

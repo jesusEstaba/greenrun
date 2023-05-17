@@ -12,6 +12,7 @@ import { UserBetRepository } from '../../../domain/UserBetRepository';
 import { UserBetRepositoryImplementation } from '../../storage/UserBetRepositoryImplementation';
 import { Currency } from '../../../../core/Currency';
 import { SettleEventResult, SettleEventResultAction } from '../../../application/SettleEventResult';
+import { SetBetStatus, SetBetStatusAction } from '../../../application/SetBetStatus';
 
 export class BetHandler {
     private readonly eventRepository: EventRepository;
@@ -21,6 +22,7 @@ export class BetHandler {
     private create: CreateBet;
     private place: PlaceBet;
     private settle: SettleEventResult;
+    private status: SetBetStatus;
 
     constructor() {
         this.eventRepository = new EventRepositoryImplementation();
@@ -40,6 +42,9 @@ export class BetHandler {
             this.betRepository,
             this.userBetStatus,
             this.walletRepository,
+        );
+        this.status = new SetBetStatus(
+            this.betRepository,
         );
     }
 
@@ -67,6 +72,13 @@ export class BetHandler {
         const action = r.payload as SettleEventResultAction;
 
         await this.settle.execute(action);
+        return h.response({}).code(200);
+    }
+
+    async handleState(r: Request, h: ResponseToolkit): Promise<ResponseObject> {
+        const action = r.payload as SetBetStatusAction;
+
+        await this.status.execute(action);
         return h.response({}).code(200);
     }
 }

@@ -9,6 +9,7 @@ export function betRepoMock(): BetRepository {
         save: jest.fn(),
         getByEventId: jest.fn(),
         setResults: jest.fn(),
+        updateState: jest.fn(),
     };
 }
 
@@ -23,6 +24,7 @@ export function userRepoMock(): UserBetRepository {
     return {
         getByBetIds: jest.fn(),
         save: jest.fn(),
+        setStatesByBetId: jest.fn(),
     };
 }
 

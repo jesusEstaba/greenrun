@@ -25,6 +25,32 @@ export class BetRepositoryImplementation implements BetRepository {
     }
 
     async setResults(bets: Bet[]): Promise<void> {
+        const betUpdates: object[] = bets.map(b => {
+            const {
+                id,
+                result,
+                status,
+            } = b;
+
+            return {
+                id,
+                result,
+                status,
+            };
+        });
+
+        await this.knexRepository.updateManyByKey('id', betUpdates);
+
+        return;
+    }
+
+    async updateState(bet: Bet): Promise<void> {
+        const { id, status } = bet;
+
+        await this.knexRepository.updateFieldsById(id, {
+            status,
+        });
+
         return;
     }
 }

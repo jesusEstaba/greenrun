@@ -25,4 +25,9 @@ export const betRoutes = [
         path: '/bet/settle',
         handler: betHandler.handleSettle.bind(betHandler),
     },
+    {
+        method: 'POST',
+        path: '/bet/status',
+        handler: betHandler.handleState.bind(betHandler),
+    },
 ];
