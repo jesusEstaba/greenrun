@@ -1,6 +1,7 @@
 import { Server } from 'hapi';
 import { betRoutes } from './modules/bet/infrastrcuture/http/routes';
 import { walletRoutes } from './modules/wallet/infrastructure/http/routes';
+import { userRoutes } from './modules/user/infrastructure/http/routes';
 import { ValidationException } from './modules/core/ValidationException';
 
 const init = async function (): Promise<Server> {
@@ -21,6 +22,7 @@ const init = async function (): Promise<Server> {
 
     server.route(betRoutes);
     server.route(walletRoutes);
+    server.route(userRoutes);
 
     server.ext('onPreResponse', (request, h) => {
         const response = request.response;

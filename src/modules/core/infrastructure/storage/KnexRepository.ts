@@ -27,6 +27,18 @@ export class KnexRepository<T> {
         return Promise.resolve(result);
     }
 
+    async getByFieldOr(where: Record<string, unknown>): Promise<T[]> {
+        const entries = Object.entries(where);
+        const queryBuilder = knexDatabaseConnection(this.tableName);
+
+        for (const [key, val] of entries) {
+            await queryBuilder.orWhere(key, val);
+        }
+
+        const result: T[] = await queryBuilder.select('*') as T[];
+        return result;
+    }
+
     async getByFields(key: string, values: unknown[]): Promise<Record<string, unknown>[]> {
         const result: Record<string, unknown>[] = await knexDatabaseConnection(this.tableName)
             .whereIn(key, values)
