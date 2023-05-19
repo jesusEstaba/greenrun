@@ -23,7 +23,7 @@ export class SettleEventResult implements UseCase<SettleEventResultAction> {
         this.walletRepository = walletRepository;
     }
 
-    async execute(action: SettleEventResultAction): Promise<unknown> {
+    async execute(action: SettleEventResultAction): Promise<object> {
         SettleEventResult.validation(action);
         const bets = await this.betRepository.getByEventId(action.eventId);
 
