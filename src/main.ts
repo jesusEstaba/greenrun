@@ -1,5 +1,5 @@
 import { Server } from 'hapi';
-import { betRoutes } from './modules/bet/infrastrcuture/http/routes';
+import { betRoutes } from './modules/bet/infrastructure/http/routes';
 import { walletRoutes } from './modules/wallet/infrastructure/http/routes';
 import { userRoutes } from './modules/user/infrastructure/http/routes';
 import { authRoutes } from './modules/auth/infrastructure/http/routes';
