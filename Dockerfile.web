@@ -1,0 +1,21 @@
+FROM --platform=linux/amd64 node:14
+
+ENV DOCKER_DEFAULT_PLATFORM=linux/amd64
+
+ENV DOCKER_BUILDKIT=1
+
+WORKDIR /app
+
+COPY package.json tsconfig.json ./
+COPY src ./src
+
+RUN npm rebuild bcrypt --build-from-source
+
+RUN npm install --also=dev
+RUN npm run dev:build
+
+COPY . .
+
+EXPOSE 4000
+
+CMD [ "npm", "start" ]
