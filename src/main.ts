@@ -6,6 +6,7 @@ import { authRoutes } from './modules/auth/infrastructure/http/routes';
 import { ValidationException } from './modules/core/ValidationException';
 import { AuthenticationException } from './modules/auth/domain/AuthenticationException';
 import { PrivilegesException } from './modules/auth/domain/PrivilegesException';
+import { routeExcluder } from './modules/core/infrastructure/http/RouteExcluder';
 
 const init = async function (): Promise<Server> {
     const server: Server = new Server({
@@ -23,10 +24,10 @@ const init = async function (): Promise<Server> {
         },
     });
 
-    server.route(betRoutes);
-    server.route(walletRoutes);
-    server.route(userRoutes);
-    server.route(authRoutes);
+    server.route(routeExcluder(betRoutes, ['options']));
+    server.route(routeExcluder(walletRoutes, ['options']));
+    server.route(routeExcluder(userRoutes, ['options']));
+    server.route(routeExcluder(authRoutes, ['options']));
 
     server.ext('onPreResponse', (request, h) => {
         const response = request.response;

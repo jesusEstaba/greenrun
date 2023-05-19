@@ -4,6 +4,13 @@ import { authMiddleware } from '../../../auth/infrastructure/http/middlewares/au
 import { adminMiddleware } from '../../../auth/infrastructure/http/middlewares/adminMiddleware';
 import { UserRepositoryImplementation } from '../../../user/infrastructure/storage/UserRepositoryImplementation';
 import { blockMiddleware } from '../../../auth/infrastructure/http/middlewares/blockMiddleware';
+import {
+    createEventSchema,
+    createBetSchema,
+    placeBetSchema,
+    settleEventResultSchema,
+    setBetStatusSchema,
+} from './swagger.schemas';
 
 const eventHandler = new EventHandler();
 const betHandler = new BetHandler();
@@ -21,10 +28,17 @@ export const betRoutes = [
                 { method: blockMiddleware(userRepository) },
             ],
         },
+        options: {
+            tags: ['api'],
+            description: 'Create Event',
+            validate: {
+                payload: createEventSchema(),
+            },
+        },
     },
     {
         method: 'POST',
-        path: '/bet',
+        path: '/bets',
         handler: betHandler.handleCreate.bind(betHandler),
         config: {
             pre: [
@@ -33,10 +47,17 @@ export const betRoutes = [
                 { method: blockMiddleware(userRepository) },
             ],
         },
+        options: {
+            tags: ['api'],
+            description: 'Create Bet',
+            validate: {
+                payload: createBetSchema(),
+            },
+        },
     },
     {
         method: 'POST',
-        path: '/bet/place',
+        path: '/bets/place',
         handler: betHandler.handlePlace.bind(betHandler),
         config: {
             pre: [
@@ -44,10 +65,17 @@ export const betRoutes = [
                 { method: blockMiddleware(userRepository) },
             ],
         },
+        options: {
+            tags: ['api'],
+            description: 'Place Bet',
+            validate: {
+                payload: placeBetSchema(),
+            },
+        },
     },
     {
         method: 'POST',
-        path: '/bet/settle',
+        path: '/bets/settle',
         handler: betHandler.handleSettle.bind(betHandler),
         config: {
             pre: [
@@ -56,10 +84,17 @@ export const betRoutes = [
                 { method: blockMiddleware(userRepository) },
             ],
         },
+        options: {
+            tags: ['api'],
+            description: 'Settle Event results',
+            validate: {
+                payload: settleEventResultSchema(),
+            },
+        },
     },
     {
         method: 'POST',
-        path: '/bet/status',
+        path: '/bets/status',
         handler: betHandler.handleState.bind(betHandler),
         config: {
             pre: [
@@ -67,6 +102,13 @@ export const betRoutes = [
                 { method: adminMiddleware },
                 { method: blockMiddleware(userRepository) },
             ],
+        },
+        options: {
+            tags: ['api'],
+            description: 'Set Bet status',
+            validate: {
+                payload: setBetStatusSchema(),
+            },
         },
     },
 ];

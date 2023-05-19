@@ -6,6 +6,7 @@ import { Auth } from '../../../domain/Auth';
 import { UserRepository } from '../../../../user/domain/UserRepository';
 import { UserRepositoryImplementation } from '../../../../user/infrastructure/storage/UserRepositoryImplementation';
 import Joi from 'joi';
+import { LoginAction } from '../../../application/Login';
 
 const JWT_SECRET = 'changeit';
 
@@ -17,26 +18,26 @@ export class AuthHandler {
     }
 
     async handleAuth(r: Request, h: ResponseToolkit): Promise<ResponseObject> {
-        const { username, password } = r.payload as { username: string, password: string };
+        const action = r.payload as LoginAction;
 
         const schema = Joi.object({
             username: Joi.string().required(),
             password: Joi.string().required(),
         });
 
-        const { error } = schema.validate({ username, password });
+        const { error } = schema.validate(action);
         if (error) {
             throw new ValidationException(error.toString());
         }
 
-        const userResult = await this.userRepository.findByUsername(username);
+        const userResult = await this.userRepository.findByUsername(action.username);
         if (userResult.isEmpty()) {
             throw new ValidationException('Invalid credentials');
         }
 
         const { id, role, password: passwd } = userResult.getValue();
 
-        const isMatch = bcrypt.compareSync(password, passwd);
+        const isMatch = bcrypt.compareSync(action.password, passwd);
         if (!isMatch) {
             throw new ValidationException('Invalid credentials');
         }
