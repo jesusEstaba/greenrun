@@ -3,16 +3,21 @@ import { UserRepository } from '../../../domain/UserRepository';
 import { CreateUser, CreateUserAction } from '../../../application/CreateUser';
 import { UserRepositoryImplementation } from '../../storage/UserRepositoryImplementation';
 import { BlockUser, BlockUserAction } from '../../../application/BlockUser';
+import { PasswordRepository } from '../../../domain/PasswordRepository';
+import { PasswordRepositoryImplementation } from '../../storage/PasswordRepositoryImplementation';
 
 export class UserHandler {
     private readonly userRepository: UserRepository;
+    private readonly passwordRepository: PasswordRepository;
     private create: CreateUser;
     private block: BlockUser;
 
     constructor() {
         this.userRepository = new UserRepositoryImplementation();
+        this.passwordRepository = new PasswordRepositoryImplementation();
         this.create = new CreateUser(
             this.userRepository,
+            this.passwordRepository,
         );
         this.block = new BlockUser(
             this.userRepository,

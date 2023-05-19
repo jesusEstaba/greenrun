@@ -33,4 +33,12 @@ export class UserRepositoryImplementation implements UserRepository {
 
         return new Optional(user);
     }
+
+    async findByUsername(username: string): Promise<Optional<User>> {
+        const [user] = await this.knexRepository.getByField({
+            username,
+        });
+
+        return new Optional(user);
+    }
 }

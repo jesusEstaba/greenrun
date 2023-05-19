@@ -1,11 +1,13 @@
 import { UserRepository } from '../../domain/UserRepository';
 import { CreateUser, CreateUserAction } from '../CreateUser';
 import { Event } from '../../../bet/domain/Event';
-import { mockUserRepo } from './mocks';
+import { mockPassRepo, mockUserRepo } from './mocks';
 import { UserRole, UserState } from '../../domain/User';
 import { Optional } from '../../../core/Optional';
+import { PasswordRepository } from '../../domain/PasswordRepository';
 
 let userRepo: UserRepository;
+let passRepo: PasswordRepository;
 let useCase: CreateUser;
 
 describe('create user', () => {
@@ -16,6 +18,7 @@ describe('create user', () => {
             phone: '+44 1442 123456',
             email: 'lhamilton@mercedes.com',
             username: 'lhamilton',
+            password: 'best_rider_ever',
             address: '123 Main Street',
             gender: 'Male',
             birthDate: '1985-01-07',
@@ -31,6 +34,7 @@ describe('create user', () => {
             userState: UserState.Allowed,
         });
         expect(userRepo.save).toBeCalledTimes(1);
+        expect(passRepo.encrypt).toBeCalledTimes(1);
     });
 
     it('when create user with existent username should fail', async () => {
@@ -41,6 +45,7 @@ describe('create user', () => {
                 phone: '+44 1442 123456',
                 email: 'lhamilton@mercedes.com',
                 username: 'existent',
+                password: 'best_rider_ever',
                 address: '123 Main Street',
                 gender: 'Male',
                 birthDate: '1985-01-07',
@@ -57,6 +62,7 @@ describe('create user', () => {
 
     beforeEach(() => {
         userRepo = mockUserRepo();
+        passRepo = mockPassRepo();
 
         userRepo.save = jest.fn().mockImplementation((event: Event) => (
             { ...event, id: 'user-123' } as Event
@@ -71,6 +77,7 @@ describe('create user', () => {
 
         useCase = new CreateUser(
             userRepo,
+            passRepo,
         );
     });
 });

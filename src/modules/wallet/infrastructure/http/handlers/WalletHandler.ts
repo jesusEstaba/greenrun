@@ -5,6 +5,7 @@ import { WithdrawWallet, WithdrawWalletAction } from '../../../application/Withd
 import { TransactionRepository } from '../../../domain/TransactionRepository';
 import { TransactionRepositoryImplementation } from '../../storage/TransactionRepositoryImplementation';
 import { Currency } from '../../../../core/Currency';
+import { Auth } from '../../../../auth/domain/Auth';
 
 export class WalletHandler {
     private readonly transactionRepository: TransactionRepository;
@@ -27,8 +28,8 @@ export class WalletHandler {
     }
 
     async handleBalance(r: Request, h: ResponseToolkit): Promise<ResponseObject> {
-        // TODO: remove when auth is implemented
-        const action = { userId: '1' } as GetWalletBalanceAction;
+        const { id } = r.pre.auth as Auth;
+        const action = { userId: id } as GetWalletBalanceAction;
 
         const result = await this.balance.execute(action);
         return h.response(result).code(200);
@@ -40,8 +41,8 @@ export class WalletHandler {
         const { amount } = r.payload as { amount: number };
         action.amount = new Currency(amount);
 
-        // TODO: remove when auth is implemented
-        action.userId = '1';
+        const { id } = r.pre.auth as Auth;
+        action.userId = id;
 
         const result = await this.deposit.execute(action);
         return h.response(result).code(200);
@@ -53,8 +54,8 @@ export class WalletHandler {
         const { amount } = r.payload as { amount: number };
         action.amount = new Currency(amount);
 
-        // TODO: remove when auth is implemented
-        action.userId = '1';
+        const { id } = r.pre.auth as Auth;
+        action.userId = id;
 
         const result = await this.withdraw.execute(action);
         return h.response(result).code(200);

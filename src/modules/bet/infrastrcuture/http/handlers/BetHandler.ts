@@ -13,6 +13,7 @@ import { UserBetRepositoryImplementation } from '../../storage/UserBetRepository
 import { Currency } from '../../../../core/Currency';
 import { SettleEventResult, SettleEventResultAction } from '../../../application/SettleEventResult';
 import { SetBetStatus, SetBetStatusAction } from '../../../application/SetBetStatus';
+import { Auth } from '../../../../auth/domain/Auth';
 
 export class BetHandler {
     private readonly eventRepository: EventRepository;
@@ -63,6 +64,9 @@ export class BetHandler {
 
         const action = r.payload as PlaceBetAction;
         action.amount = new Currency(amount);
+
+        const { id } = r.pre.auth as Auth;
+        action.userId = id;
 
         const created = await this.place.execute(action);
         return h.response(created).code(200);

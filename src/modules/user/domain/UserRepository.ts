@@ -3,6 +3,7 @@ import { Optional } from '../../core/Optional';
 
 export interface UserRepository {
     findById(id: string): Promise<Optional<User>>
+    findByUsername(username: string): Promise<Optional<User>>
     findByUsernameOrEmailOrPhone(
         username: string,
         email: string,

@@ -2,7 +2,10 @@ import { Server } from 'hapi';
 import { betRoutes } from './modules/bet/infrastrcuture/http/routes';
 import { walletRoutes } from './modules/wallet/infrastructure/http/routes';
 import { userRoutes } from './modules/user/infrastructure/http/routes';
+import { authRoutes } from './modules/auth/infrastructure/http/routes';
 import { ValidationException } from './modules/core/ValidationException';
+import { AuthenticationException } from './modules/auth/domain/AuthenticationException';
+import { PrivilegesException } from './modules/auth/domain/PrivilegesException';
 
 const init = async function (): Promise<Server> {
     const server: Server = new Server({
@@ -23,6 +26,7 @@ const init = async function (): Promise<Server> {
     server.route(betRoutes);
     server.route(walletRoutes);
     server.route(userRoutes);
+    server.route(authRoutes);
 
     server.ext('onPreResponse', (request, h) => {
         const response = request.response;
@@ -31,6 +35,18 @@ const init = async function (): Promise<Server> {
             return h.response({
                 message: response.message,
             }).code(400);
+        }
+
+        if (response instanceof AuthenticationException) {
+            return h.response({
+                message: response.message,
+            }).code(401);
+        }
+
+        if (response instanceof PrivilegesException) {
+            return h.response({
+                message: response.message,
+            }).code(403);
         }
 
         if (response instanceof Error) {
