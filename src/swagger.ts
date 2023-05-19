@@ -7,7 +7,7 @@ import { betRoutes } from './modules/bet/infrastrcuture/http/routes';
 import { walletRoutes } from './modules/wallet/infrastructure/http/routes';
 import { userRoutes } from './modules/user/infrastructure/http/routes';
 import { authRoutes } from './modules/auth/infrastructure/http/routes';
-import { routeExcluder } from './modules/core/infrastructure/http/RouteExcluder';
+import { routeExcluder } from './modules/core/infrastructure/http/routeExcluder';
 
 const server = new Server({
     port: 3000,
@@ -21,6 +21,7 @@ const init = async () => {
             title: 'GreenRun API Documentation',
             version: '1.0.0',
         },
+        host: 'localhost:4000/api/v1',
         tags: [
             { name: 'bets', description: 'Bets' },
             { name: 'events', description: 'Events' },
@@ -42,14 +43,23 @@ const init = async () => {
             path: '/docs',
             swaggerOptions: {
                 validatorUrl: null,
+                docExpansion: 'list',
             },
         } as object,
     } as ServerRegisterPluginObject<object>);
 
-    server.route(routeExcluder(betRoutes, ['config']));
-    server.route(routeExcluder(walletRoutes, ['config']));
-    server.route(routeExcluder(userRoutes, ['config']));
-    server.route(routeExcluder(authRoutes, ['config']));
+    const routes = [
+        betRoutes,
+        walletRoutes,
+        userRoutes,
+        authRoutes,
+    ];
+
+    for (const routeGroup of routes) {
+        server.route(
+            routeExcluder(routeGroup, ['config']),
+        );
+    }
 
     await server.start();
 
@@ -57,6 +67,7 @@ const init = async () => {
 
 init().then(() => {
     console.log('Swagger server started');
-}).catch(() => {
+}).catch((e) => {
     console.log('Fail to start swagger server');
+    console.log(e);
 });

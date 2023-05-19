@@ -6,13 +6,15 @@ import { authRoutes } from './modules/auth/infrastructure/http/routes';
 import { ValidationException } from './modules/core/ValidationException';
 import { AuthenticationException } from './modules/auth/domain/AuthenticationException';
 import { PrivilegesException } from './modules/auth/domain/PrivilegesException';
-import { routeExcluder } from './modules/core/infrastructure/http/RouteExcluder';
+import { routeExcluder } from './modules/core/infrastructure/http/routeExcluder';
 
 const init = async function (): Promise<Server> {
     const server: Server = new Server({
         port: process.env.PORT || 4000,
         host: '0.0.0.0',
     });
+
+    server.realm.modifiers.route.prefix = '/api/v1';
 
     server.route({
         method: 'GET',
@@ -24,10 +26,18 @@ const init = async function (): Promise<Server> {
         },
     });
 
-    server.route(routeExcluder(betRoutes, ['options']));
-    server.route(routeExcluder(walletRoutes, ['options']));
-    server.route(routeExcluder(userRoutes, ['options']));
-    server.route(routeExcluder(authRoutes, ['options']));
+    const routes = [
+        betRoutes,
+        walletRoutes,
+        userRoutes,
+        authRoutes,
+    ];
+
+    for (const routeGroup of routes) {
+        server.route(
+            routeExcluder(routeGroup, ['options']),
+        );
+    }
 
     server.ext('onPreResponse', (request, h) => {
         const response = request.response;
