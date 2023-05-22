@@ -10,8 +10,8 @@ import { authRoutes } from './modules/auth/infrastructure/http/routes';
 import { routeExcluder } from './modules/core/infrastructure/http/routeExcluder';
 
 const server = new Server({
-    port: 3000,
-    host: 'localhost',
+    port: process.env.PORT || 3000,
+    host: '0.0.0.0',
 });
 
 const init = async () => {
